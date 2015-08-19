@@ -1,5 +1,5 @@
 # jinteg
-A super-simple integration testing framework &amp; toolbox for Java
+A super-simple integration testing framework for Java
 
 I created this project to fill a need that I had for a simple way to write consistent integration tests designed to be run in a terminal in a production (or near-production) environment.  I didn't want to rely on specifically tailored environments, complicated mocking constructs, or funky test runners. jinteg provides a simple framework for writing integration tests that can be run directly from java (via a main method) and whose results are easily parsed.
 
@@ -47,9 +47,10 @@ A pre-built jar is available for download in the releases section.
 
 ## Hacking and Building
 
-Gradle is the build tool of choice for this project.  There are no special Gradle tasks implemented here, so building is quite simple:
+Gradle is the build tool of choice for this project.  There are no special Gradle tasks implemented here, so building is quite simple: 
 * `gradle eclipse` builds the project and classpath files needed to work in Eclipse
 * `gradle jar` builds the jar
 
+*Note: if your workstation does not have Gradle installed, use ./gradlew or ./gradlew.bat in place of gradle in the previous commands*
 
 
