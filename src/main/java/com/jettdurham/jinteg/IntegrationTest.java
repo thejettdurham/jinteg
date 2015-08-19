@@ -7,20 +7,58 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
+// TODO: Javadoc stuff
+// TODO: Move default failure and success prefixes from ITResult impls to here.
+// TODO: Unit Tests
+// TODO: Commit
+
+/**
+ * The base class that defines an Integration Test.
+ * Test classes must extend this class to get the {@link #run(Class)} method that provides the benefit of this package.
+ * 
+ * @author jettdurham
+ *
+ */
 public abstract class IntegrationTest {
 	
 	private static final String FAIL_PREFIX = "FAILURE";
+	private static final String SUCCESS_PREFIX = "Success";
 	private static final String EXCEPTION_PREFIX = "EXCEPTION";
 	
-	public static void run(Class<?> kls) throws Exception {
+	
+	/**
+	 * Runs all public static methods in the given class that return a type that implements {@link ITResult}
+	 * This run method will stop if any tests fail and/or if any exceptions are thrown.
+	 * These behaviors can be overridden by using one of the other run methods.
+	 * 
+	 * @param kls A reference to the test class itself (not the classes under test)
+	 * @throws Exception Given the design of this class, it's impossible to know what specific exceptions can be thrown
+	 */
+	public static void run(Class<? extends IntegrationTest> kls) throws Exception {
 		run(kls, true, true);
 	}
 	
-	public static void run(Class<?> kls, boolean stopOnFailure) throws Exception {
+	/**
+	 * Same as {@link #run(Class)}, but allows for execution to continue if a test fails.
+	 * This run method will stop if any exceptions are thrown
+	 * 
+	 * @param kls A reference to the test class itself (not the classes under test)
+	 * @param stopOnFailure Whether execution should stop if a test fails
+	 * @throws Exception Given the design of this class, it's impossible to know what specific exceptions can be thrown
+	 */
+	public static void run(Class<? extends IntegrationTest> kls, boolean stopOnFailure) throws Exception {
 		run(kls, stopOnFailure, true);
 	}
 	
-	public static void run(Class<?> kls, boolean stopOnFailure, boolean stopOnException) throws Exception {
+	/**
+	 * Same as {@link #run(Class)}, but allows for execution to continue if a test fails or an exception is thrown.
+	 * 
+	 * @param kls A reference to the test class itself (not the classes under test)
+	 * @param stopOnFailure Whether execution should stop if a test fails
+	 * @param stopOnException Whether execution should stop if an exception is thrown
+	 * @throws Exception Given the design of this class, it's impossible to know what specific exceptions can be thrown
+	 */
+	public static void run(Class<? extends IntegrationTest> kls, boolean stopOnFailure, boolean stopOnException) throws Exception {
 		String className = kls.getName();
 		System.out.println("Testing class " + className);
 		
@@ -30,15 +68,15 @@ public abstract class IntegrationTest {
 		for(Method m: methods) {
 			String methodName = m.getName();
 			
-			if (m.getReturnType().equals(ITReturn.class)) {
+			if (m.getReturnType().equals(ITResult.class) && Modifier.isPublic(m.getModifiers())) {
 				StringBuffer outputLine = new StringBuffer(className + "#" + methodName + " - ");
 				
 				if (Modifier.isStatic(m.getModifiers())) {
 					try {
-						ITReturn ret = (ITReturn)m.invoke(new Object(){}, new Object[]{});
+						ITResult ret = (ITResult)m.invoke(new Object(){}, new Object[]{});
 						
 						if (!ret.getStatus()) {
-							outputLine.append(ret.getStatusMessage());
+							outputLine.append(FAIL_PREFIX + ": " + ret.getStatusMessage());
 							if (stopOnFailure) {
 								System.out.println(outputLine.toString());
 								System.out.println("Stopping due to test failure");
@@ -46,7 +84,7 @@ public abstract class IntegrationTest {
 								break;
 							}
 						} else {
-							outputLine.append(ret.getStatusMessage());
+							outputLine.append(SUCCESS_PREFIX + ": " + ret.getStatusMessage());
 						}
 						
 					} catch (Exception e) {
