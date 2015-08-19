@@ -7,11 +7,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
-// TODO: Javadoc stuff
-// TODO: Move default failure and success prefixes from ITResult impls to here.
-// TODO: Unit Tests
-// TODO: Commit
-
 /**
  * The base class that defines an Integration Test.
  * Test classes must extend this class to get the {@link #run(Class)} method that provides the benefit of this package.
